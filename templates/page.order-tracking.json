@@ -1,0 +1,14 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-order-tracking",
+      "settings": {
+        "heading": "Track Your Order",
+        "subtext": "Enter your order number and email address to check on your delivery.",
+        "cta": "Track My Order",
+        "help_link_label": "Contact us"
+      }
+    }
+  },
+  "order": ["main"]
+}

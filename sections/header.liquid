@@ -1,0 +1,639 @@
+{% comment %}
+  Niche Aura — sections/header.liquid
+  Scheme 02 (Inverse): Deep Navy bg · Ice White text · Electric Teal accents
+  Fonts: Montserrat 900 (logo/nav) · JetBrains Mono italic (labels)
+{% endcomment %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;900&family=Cormorant+Garamond:ital,wght@0,300;1,300&family=JetBrains+Mono:ital,wght@1,300&display=swap" rel="stylesheet">
+
+<style>
+  /* ─── Reset & Tokens ─────────────────────────────────────────── */
+  :root {
+    --na-navy:       #002D72;
+    --na-navy-800:   #0C3E8A;
+    --na-teal:       #09CDCD;
+    --na-sea-glass:  #A0E5D9;
+    --na-ice:        #EEF4FB;
+    --na-violet:     #81459E;
+
+    --header-height: 68px;
+    --header-height-scrolled: 56px;
+    --transition: 0.25s ease;
+  }
+
+  /* ─── Outer wrapper ──────────────────────────────────────────── */
+  #na-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+    background: var(--na-navy);
+    border-bottom: 1px solid var(--na-navy-800);
+    transition: height var(--transition), box-shadow var(--transition);
+  }
+
+  #na-header.scrolled {
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.35);
+  }
+
+  /* ─── Inner layout ───────────────────────────────────────────── */
+  .na-header__inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+    height: var(--header-height);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    transition: height var(--transition);
+  }
+
+  #na-header.scrolled .na-header__inner {
+    height: var(--header-height-scrolled);
+  }
+
+  /* ─── Wordmark / Logo ────────────────────────────────────────── */
+  .na-header__logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    justify-self: start;
+  }
+
+  .na-header__wordmark {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 18px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--na-ice);
+    line-height: 1;
+    transition: color var(--transition);
+  }
+
+  .na-header__wordmark:hover {
+    color: var(--na-teal);
+  }
+
+  /* ─── Desktop Nav ────────────────────────────────────────────── */
+  .na-header__nav {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .na-header__nav-link {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--na-ice);
+    text-decoration: none;
+    position: relative;
+    padding-bottom: 3px;
+    transition: color var(--transition);
+  }
+
+  .na-header__nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--na-teal);
+    transition: width var(--transition);
+  }
+
+  .na-header__nav-link:hover {
+    color: var(--na-teal);
+  }
+
+  .na-header__nav-link:hover::after,
+  .na-header__nav-link[aria-current="page"]::after {
+    width: 100%;
+  }
+
+  .na-header__nav-link[aria-current="page"] {
+    color: var(--na-teal);
+  }
+
+  /* ─── Icon group ─────────────────────────────────────────────── */
+  .na-header__icons {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    justify-self: end;
+  }
+
+  .na-header__icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    color: var(--na-ice);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color var(--transition);
+    position: relative;
+  }
+
+  .na-header__icon-btn:hover {
+    color: var(--na-teal);
+  }
+
+  .na-header__icon-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Cart badge */
+  .na-cart-count {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--na-teal);
+    color: var(--na-navy);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 8px;
+    line-height: 1;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+    pointer-events: none;
+    transition: transform 0.2s ease;
+  }
+
+  .na-cart-count[data-count="0"] {
+    display: none;
+  }
+
+  /* ─── Search bar ─────────────────────────────────────────────── */
+  .na-search-bar {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--na-navy-800);
+    border-bottom: 1px solid var(--na-teal);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transform: translateY(-4px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition), transform var(--transition);
+  }
+
+  .na-search-bar.is-open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+  }
+
+  .na-search-bar__input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--na-ice);
+    caret-color: var(--na-teal);
+  }
+
+  .na-search-bar__input::placeholder {
+    color: var(--na-sea-glass);
+    opacity: 0.6;
+  }
+
+  .na-search-bar__submit {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 1px;
+    color: var(--na-teal);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  /* ─── Hamburger (mobile only) ────────────────────────────────── */
+  .na-header__hamburger {
+    display: none;
+  }
+
+  /* ─── Mobile menu overlay ────────────────────────────────────── */
+  .na-mobile-menu {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: var(--na-navy);
+    flex-direction: column;
+    padding: 24px;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .na-mobile-menu.is-open {
+    transform: translateX(0);
+  }
+
+  .na-mobile-menu__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+  }
+
+  .na-mobile-menu__close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--na-ice);
+    padding: 6px;
+    display: flex;
+  }
+
+  .na-mobile-menu__close svg {
+    width: 22px;
+    height: 22px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+  }
+
+  .na-mobile-menu__nav {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .na-mobile-menu__nav-link {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 28px;
+    letter-spacing: -0.5px;
+    color: var(--na-ice);
+    text-decoration: none;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(238, 244, 251, 0.08);
+    transition: color var(--transition);
+  }
+
+  .na-mobile-menu__nav-link:hover {
+    color: var(--na-teal);
+  }
+
+  .na-mobile-menu__footer {
+    margin-top: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--na-sea-glass);
+    letter-spacing: 1px;
+    opacity: 0.5;
+  }
+
+  /* ─── Responsive ─────────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .na-header__nav {
+      display: none;
+    }
+
+    .na-header__hamburger {
+      display: flex;
+    }
+
+    .na-mobile-menu {
+      display: flex;
+    }
+
+    .na-header__inner {
+      grid-template-columns: auto 1fr auto;
+    }
+
+    .na-header__logo {
+      justify-self: start;
+    }
+
+    .na-header__icons {
+      gap: 8px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .na-header__inner {
+      padding: 0 16px;
+    }
+
+    .na-header__wordmark {
+      font-size: 15px;
+      letter-spacing: 3px;
+    }
+  }
+</style>
+
+{%- liquid
+  assign main_menu = section.settings.menu | default: 'main-menu'
+  assign show_search = section.settings.show_search
+  assign cart_count = cart.item_count
+-%}
+
+<header id="na-header" role="banner">
+  <div class="na-header__inner" style="position: relative;">
+
+    {%- comment %} ── Wordmark ── {%- endcomment %}
+    <a href="{{ routes.root_url }}" class="na-header__logo" aria-label="{{ shop.name }} — home">
+      <span class="na-header__wordmark">{{ section.settings.wordmark | default: shop.name | upcase }}</span>
+    </a>
+
+    {%- comment %} ── Desktop navigation ── {%- endcomment %}
+    <nav aria-label="Primary navigation">
+      <ul class="na-header__nav">
+        {%- for link in linklists[main_menu].links -%}
+          <li>
+            <a
+              href="{{ link.url }}"
+              class="na-header__nav-link"
+              {% if link.active %}aria-current="page"{% endif %}
+            >
+              {{ link.title }}
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+
+    {%- comment %} ── Icons ── {%- endcomment %}
+    <div class="na-header__icons">
+
+      {%- if show_search -%}
+        <button
+          class="na-header__icon-btn"
+          id="na-search-toggle"
+          aria-label="Toggle search"
+          aria-expanded="false"
+          aria-controls="na-search-bar"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"/>
+            <line x1="16.5" y1="16.5" x2="22" y2="22"/>
+          </svg>
+        </button>
+      {%- endif -%}
+
+      <a
+        href="{{ routes.cart_url }}"
+        class="na-header__icon-btn"
+        aria-label="Cart — {{ cart_count }} {{ cart_count | pluralize: 'item', 'items' }}"
+        id="na-cart-icon"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 01-8 0"/>
+        </svg>
+        <span class="na-cart-count" id="na-cart-count" data-count="{{ cart_count }}">
+          {{- cart_count -}}
+        </span>
+      </a>
+
+      <button
+        class="na-header__icon-btn na-header__hamburger"
+        id="na-menu-open"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="na-mobile-menu"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <line x1="3" y1="7" x2="21" y2="7"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="17" x2="21" y2="17"/>
+        </svg>
+      </button>
+
+    </div>{%- comment %} /.na-header__icons {%- endcomment %}
+
+    {%- comment %} ── Search bar (drops below header) ── {%- endcomment %}
+    {%- if show_search -%}
+      <div
+        class="na-search-bar"
+        id="na-search-bar"
+        role="search"
+        aria-hidden="true"
+        style="position: absolute; top: 100%; left: -24px; right: -24px;"
+      >
+        <form action="{{ routes.search_url }}" method="get" style="display:contents;">
+          <input
+            type="search"
+            name="q"
+            class="na-search-bar__input"
+            placeholder="Search products…"
+            id="na-search-input"
+            aria-label="Search"
+            autocomplete="off"
+          >
+          <input type="hidden" name="type" value="product">
+          <button type="submit" class="na-search-bar__submit" aria-label="Submit search">
+            // search
+          </button>
+        </form>
+      </div>
+    {%- endif -%}
+
+  </div>{%- comment %} /.na-header__inner {%- endcomment %}
+</header>
+
+{%- comment %} ── Mobile menu overlay ── {%- endcomment %}
+<div
+  class="na-mobile-menu"
+  id="na-mobile-menu"
+  aria-label="Mobile navigation"
+  aria-hidden="true"
+  role="dialog"
+>
+  <div class="na-mobile-menu__header">
+    <span class="na-header__wordmark">{{ section.settings.wordmark | default: shop.name | upcase }}</span>
+    <button
+      class="na-mobile-menu__close"
+      id="na-menu-close"
+      aria-label="Close menu"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+
+  <nav aria-label="Mobile navigation">
+    <ul class="na-mobile-menu__nav">
+      {%- for link in linklists[main_menu].links -%}
+        <li>
+          <a
+            href="{{ link.url }}"
+            class="na-mobile-menu__nav-link"
+            {% if link.active %}aria-current="page"{% endif %}
+          >
+            {{ link.title }}
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </nav>
+
+  <div class="na-mobile-menu__footer">// niche aura</div>
+</div>
+
+<script>
+  (function () {
+    const header       = document.getElementById('na-header');
+    const openBtn      = document.getElementById('na-menu-open');
+    const closeBtn     = document.getElementById('na-menu-close');
+    const mobileMenu   = document.getElementById('na-mobile-menu');
+    const searchToggle = document.getElementById('na-search-toggle');
+    const searchBar    = document.getElementById('na-search-bar');
+    const searchInput  = document.getElementById('na-search-input');
+    const cartCount    = document.getElementById('na-cart-count');
+
+    // ── Sticky scroll behaviour ──────────────────────────────────
+    let lastY = 0;
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY;
+      header.classList.toggle('scrolled', y > 10);
+      lastY = y;
+    }, { passive: true });
+
+    // ── Mobile menu ──────────────────────────────────────────────
+    function openMenu() {
+      mobileMenu.classList.add('is-open');
+      mobileMenu.setAttribute('aria-hidden', 'false');
+      openBtn.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+      closeBtn.focus();
+    }
+
+    function closeMenu() {
+      mobileMenu.classList.remove('is-open');
+      mobileMenu.setAttribute('aria-hidden', 'true');
+      openBtn.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+      openBtn.focus();
+    }
+
+    if (openBtn)  openBtn.addEventListener('click', openMenu);
+    if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (mobileMenu.classList.contains('is-open')) closeMenu();
+        if (searchBar && searchBar.classList.contains('is-open')) closeSearch();
+      }
+    });
+
+    // ── Search toggle ────────────────────────────────────────────
+    function openSearch() {
+      searchBar.classList.add('is-open');
+      searchBar.setAttribute('aria-hidden', 'false');
+      searchToggle.setAttribute('aria-expanded', 'true');
+      searchInput.focus();
+    }
+
+    function closeSearch() {
+      searchBar.classList.remove('is-open');
+      searchBar.setAttribute('aria-hidden', 'true');
+      searchToggle.setAttribute('aria-expanded', 'false');
+    }
+
+    if (searchToggle) {
+      searchToggle.addEventListener('click', () => {
+        searchBar.classList.contains('is-open') ? closeSearch() : openSearch();
+      });
+    }
+
+    // Close search on outside click
+    document.addEventListener('click', (e) => {
+      if (
+        searchBar &&
+        searchBar.classList.contains('is-open') &&
+        !searchBar.contains(e.target) &&
+        !searchToggle.contains(e.target)
+      ) {
+        closeSearch();
+      }
+    });
+
+    // ── Live cart count update (works with Shopify AJAX API) ─────
+    document.addEventListener('cart:updated', (e) => {
+      if (!cartCount) return;
+      const count = e.detail?.itemCount ?? 0;
+      cartCount.textContent = count;
+      cartCount.dataset.count = count;
+    });
+
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Header",
+  "tag": "div",
+  "class": "na-header-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "wordmark",
+      "label": "Wordmark text",
+      "default": "YOURNICHE",
+      "info": "Displayed in place of a logo image. Uses Montserrat 900."
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Navigation menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Show search icon",
+      "default": true
+    }
+  ],
+  "blocks": [],
+  "enabled_on": {
+    "groups": ["header"]
+  }
+}
+{% endschema %}

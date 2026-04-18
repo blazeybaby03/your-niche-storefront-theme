@@ -1,0 +1,65 @@
+{% comment %}
+  Niche Aura — snippets/reviews-widget.liquid
+  Renders the Judge.me reviews widget on the product page.
+  Include via: {%- render 'reviews-widget', product: product -%}
+  in sections/main-product.liquid after the product description.
+{% endcomment %}
+
+<div class="na-reviews" id="na-reviews-section">
+
+  <style>
+    .na-reviews {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    .na-reviews__divider {
+      height: 1px;
+      background: var(--na-b100, #D4E6F8);
+      margin-bottom: 40px;
+    }
+
+    .na-reviews__eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      font-style: italic;
+      font-weight: 300;
+      letter-spacing: 2px;
+      color: var(--na-teal, #09CDCD);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .na-reviews__heading {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 900;
+      font-size: 26px;
+      letter-spacing: -0.5px;
+      color: var(--na-navy, #002D72);
+      margin-bottom: 32px;
+    }
+
+    /* Override Judge.me widget colours to match brand */
+    #judgeme_product_reviews .jdgm-rev-widg__summary-stars .jdgm-star { color: var(--na-teal, #09CDCD) !important; }
+    #judgeme_product_reviews .jdgm-rev__header .jdgm-star { color: var(--na-teal, #09CDCD) !important; }
+    #judgeme_product_reviews .jdgm-write-rev-link,
+    #judgeme_product_reviews .jdgm-paginate__page.jdgm--is-selected { color: var(--na-navy, #002D72) !important; }
+    #judgeme_product_reviews .jdgm-rev__title { font-family: 'Montserrat', sans-serif !important; font-weight: 700 !important; color: var(--na-navy, #002D72) !important; }
+    #judgeme_product_reviews .jdgm-rev__body { font-family: 'Cormorant Garamond', serif !important; font-size: 16px !important; font-style: italic !important; font-weight: 300 !important; color: var(--na-navy, #002D72) !important; }
+    #judgeme_product_reviews .jdgm-rev__author { font-family: 'JetBrains Mono', monospace !important; font-size: 9px !important; font-style: italic !important; font-weight: 300 !important; color: rgba(0,45,114,0.4) !important; }
+  </style>
+
+  <div class="na-reviews__divider"></div>
+  <span class="na-reviews__eyebrow">// customer reviews</span>
+  <h2 class="na-reviews__heading">What people are saying</h2>
+
+  {%- comment %}
+    Judge.me widget — renders automatically once the app is installed.
+    The app injects the widget into this div using the product handle.
+  {%- endcomment %}
+  <div id="judgeme_product_reviews" class="jdgm-widget jdgm-review-widget" data-id="{{ product.id }}" data-product-title="{{ product.title | escape }}">
+    {{ product.metafields.judgeme.widget }}
+  </div>
+
+</div>

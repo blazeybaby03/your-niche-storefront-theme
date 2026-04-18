@@ -1,0 +1,419 @@
+{% comment %}
+  Niche Aura — sections/featured-products.liquid
+  Scheme 01 (Primary): Ice White bg · Deep Navy text · Electric Teal accents
+  Home page featured products grid. Emma selects products in the theme editor.
+{% endcomment %}
+
+<style>
+  .na-featured {
+    padding: 72px 24px 80px;
+    background: var(--na-ice, #EEF4FB);
+  }
+
+  .na-featured__inner {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  /* ─── Header row ─────────────────────────────────────────────── */
+  .na-featured__header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 40px;
+  }
+
+  .na-featured__header-left {}
+
+  .na-featured__eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: var(--na-teal, #09CDCD);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .na-featured__heading {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 32px;
+    letter-spacing: -0.6px;
+    color: var(--na-navy, #002D72);
+    line-height: 1.1;
+  }
+
+  .na-featured__view-all {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 1.5px;
+    color: var(--na-navy, #002D72);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0,45,114,0.2);
+    padding-bottom: 2px;
+    white-space: nowrap;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .na-featured__view-all:hover {
+    color: var(--na-teal, #09CDCD);
+    border-color: var(--na-teal, #09CDCD);
+  }
+
+  /* ─── Grid ───────────────────────────────────────────────────── */
+  .na-featured__grid {
+    display: grid;
+    gap: 20px;
+  }
+
+  .na-featured__grid--2 { grid-template-columns: repeat(2, 1fr); }
+  .na-featured__grid--3 { grid-template-columns: repeat(3, 1fr); }
+  .na-featured__grid--4 { grid-template-columns: repeat(4, 1fr); }
+
+  /* ─── Product card ───────────────────────────────────────────── */
+  .na-fp-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    group: true;
+  }
+
+  .na-fp-card__img-wrap {
+    aspect-ratio: 1;
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--na-b100, #D4E6F8);
+    margin-bottom: 14px;
+    position: relative;
+  }
+
+  .na-fp-card__img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.45s ease;
+    display: block;
+  }
+
+  .na-fp-card:hover .na-fp-card__img-wrap img {
+    transform: scale(1.05);
+  }
+
+  /* Badges */
+  .na-fp-card__badges {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .na-fp-card__badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    border-radius: 40px;
+    display: inline-block;
+  }
+
+  .na-fp-card__badge--sale { background: var(--na-violet, #81459E); color: var(--na-ice, #EEF4FB); }
+  .na-fp-card__badge--new  { background: var(--na-teal, #09CDCD); color: var(--na-navy, #002D72); }
+
+  /* Quick add overlay */
+  .na-fp-card__quick-add {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 45, 114, 0.92);
+    padding: 12px;
+    text-align: center;
+    transform: translateY(100%);
+    transition: transform 0.25s ease;
+  }
+
+  .na-fp-card:hover .na-fp-card__quick-add {
+    transform: translateY(0);
+  }
+
+  .na-fp-card__quick-add-btn {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--na-navy, #002D72);
+    background: var(--na-teal, #09CDCD);
+    border: none;
+    border-radius: 40px;
+    padding: 9px 20px;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s ease;
+  }
+
+  .na-fp-card__quick-add-btn:hover {
+    background: var(--na-sea-glass, #A0E5D9);
+  }
+
+  /* Card info */
+  .na-fp-card__vendor {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 1px;
+    color: rgba(0,45,114,0.35);
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  .na-fp-card__title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: -0.2px;
+    color: var(--na-navy, #002D72);
+    margin-bottom: 8px;
+    line-height: 1.3;
+    transition: color 0.2s ease;
+  }
+
+  .na-fp-card:hover .na-fp-card__title {
+    color: var(--na-teal, #09CDCD);
+  }
+
+  .na-fp-card__price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .na-fp-card__price {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--na-navy, #002D72);
+  }
+
+  .na-fp-card__compare {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    font-weight: 300;
+    color: rgba(0,45,114,0.3);
+    text-decoration: line-through;
+  }
+
+  /* ─── Responsive ─────────────────────────────────────────────── */
+  @media (max-width: 960px) {
+    .na-featured__grid--4 { grid-template-columns: repeat(2, 1fr); }
+    .na-featured__grid--3 { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 600px) {
+    .na-featured {
+      padding: 48px 16px 60px;
+    }
+    .na-featured__grid--4,
+    .na-featured__grid--3,
+    .na-featured__grid--2 { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .na-featured__heading { font-size: 26px; }
+    .na-fp-card__quick-add { display: none; }
+  }
+</style>
+
+{%- liquid
+  assign cols    = section.settings.columns | default: 4
+  assign eyebrow = section.settings.eyebrow | default: 'best sellers'
+  assign heading = section.settings.heading | default: 'Shop Our Best Sellers'
+  assign show_view_all = section.settings.show_view_all
+  assign view_all_url  = section.settings.view_all_url | default: routes.all_products_collection_url
+-%}
+
+<section class="na-featured" id="na-featured-section">
+  <div class="na-featured__inner">
+
+    <div class="na-featured__header">
+      <div class="na-featured__header-left">
+        <span class="na-featured__eyebrow">// {{ eyebrow }}</span>
+        <h2 class="na-featured__heading">{{ heading }}</h2>
+      </div>
+      {%- if show_view_all -%}
+        <a href="{{ view_all_url }}" class="na-featured__view-all">View all →</a>
+      {%- endif -%}
+    </div>
+
+    <div class="na-featured__grid na-featured__grid--{{ cols }}">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'product' -%}
+          {%- assign featured_product = block.settings.product -%}
+          {%- if featured_product != blank -%}
+            <a href="{{ featured_product.url }}" class="na-fp-card" {{ block.shopify_attributes }}>
+              <div class="na-fp-card__img-wrap">
+                {%- if featured_product.featured_image -%}
+                  <img
+                    src="{{ featured_product.featured_image | image_url: width: 800 }}"
+                    alt="{{ featured_product.featured_image.alt | escape }}"
+                    width="800" height="800"
+                    loading="lazy"
+                  >
+                {%- endif -%}
+                <div class="na-fp-card__badges">
+                  {%- if featured_product.compare_at_price > featured_product.price -%}
+                    <span class="na-fp-card__badge na-fp-card__badge--sale">// sale</span>
+                  {%- endif -%}
+                  {%- if block.settings.show_new_badge -%}
+                    <span class="na-fp-card__badge na-fp-card__badge--new">// new</span>
+                  {%- endif -%}
+                </div>
+                {%- if featured_product.available -%}
+                  <div class="na-fp-card__quick-add">
+                    <button
+                      class="na-fp-card__quick-add-btn"
+                      data-product-id="{{ featured_product.variants.first.id }}"
+                      aria-label="Quick add {{ featured_product.title }}"
+                    >
+                      + Quick Add
+                    </button>
+                  </div>
+                {%- endif -%}
+              </div>
+              <span class="na-fp-card__vendor">{{ featured_product.vendor }}</span>
+              <p class="na-fp-card__title">{{ featured_product.title }}</p>
+              <div class="na-fp-card__price-row">
+                <span class="na-fp-card__price">{{ featured_product.price | money }}</span>
+                {%- if featured_product.compare_at_price > featured_product.price -%}
+                  <span class="na-fp-card__compare">{{ featured_product.compare_at_price | money }}</span>
+                {%- endif -%}
+              </div>
+            </a>
+          {%- else -%}
+            {%- comment %} Placeholder when no product selected {%- endcomment %}
+            <div class="na-fp-card" {{ block.shopify_attributes }}>
+              <div class="na-fp-card__img-wrap" style="background: var(--na-b100,#D4E6F8);"></div>
+              <span class="na-fp-card__vendor">// select a product</span>
+              <p class="na-fp-card__title" style="opacity:0.3;">Product name</p>
+              <div class="na-fp-card__price-row">
+                <span class="na-fp-card__price" style="opacity:0.3;">$0.00</span>
+              </div>
+            </div>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+  </div>
+</section>
+
+<script>
+  // Quick Add to cart
+  document.querySelectorAll('.na-fp-card__quick-add-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const id = btn.dataset.productId;
+      btn.textContent = '// adding…';
+      btn.disabled = true;
+      try {
+        await fetch('/cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, quantity: 1 })
+        });
+        const cart = await fetch('/cart.js').then(r => r.json());
+        document.dispatchEvent(new CustomEvent('cart:updated', { detail: { itemCount: cart.item_count } }));
+        btn.textContent = '✓ Added';
+        setTimeout(() => { btn.textContent = '+ Quick Add'; btn.disabled = false; }, 1800);
+      } catch {
+        btn.textContent = 'Try again';
+        btn.disabled = false;
+      }
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Featured products",
+  "tag": "div",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow label",
+      "default": "best sellers"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section heading",
+      "default": "Shop Our Best Sellers"
+    },
+    {
+      "type": "select",
+      "id": "columns",
+      "label": "Columns (desktop)",
+      "options": [
+        { "value": "2", "label": "2 columns" },
+        { "value": "3", "label": "3 columns" },
+        { "value": "4", "label": "4 columns" }
+      ],
+      "default": "4"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show 'View all' link",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "view_all_url",
+      "label": "'View all' destination",
+      "info": "Defaults to all products if left blank"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_new_badge",
+          "label": "Show 'New' badge",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured products",
+      "blocks": [
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "templates": ["index"]
+  }
+}
+{% endschema %}

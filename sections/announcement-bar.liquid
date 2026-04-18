@@ -1,0 +1,344 @@
+{% comment %}
+  Niche Aura — sections/announcement-bar.liquid
+  Scheme 02 (Inverse): Deep Navy bg · Ice White text · Electric Teal accents
+  Sits above the header. Supports multiple rotating messages.
+{% endcomment %}
+
+{%- unless section.blocks.size == 0 -%}
+
+<style>
+  #na-announcement {
+    background: var(--na-navy, #002D72);
+    border-bottom: 1px solid rgba(9, 205, 205, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .na-announcement__inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 48px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* Rotating message track */
+  .na-announcement__track {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    position: relative;
+    height: 100%;
+  }
+
+  .na-announcement__message {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    pointer-events: none;
+    text-align: center;
+  }
+
+  .na-announcement__message.is-active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+  }
+
+  .na-announcement__text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 1px;
+    color: var(--na-ice, #EEF4FB);
+  }
+
+  .na-announcement__link {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 1px;
+    color: var(--na-teal, #09CDCD);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(9, 205, 205, 0.4);
+    transition: border-color 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .na-announcement__link:hover {
+    border-color: var(--na-teal, #09CDCD);
+  }
+
+  /* Dot indicators (only shown when > 1 message) */
+  .na-announcement__dots {
+    position: absolute;
+    right: 48px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+
+  .na-announcement__dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(238, 244, 251, 0.2);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .na-announcement__dot.is-active {
+    background: var(--na-teal, #09CDCD);
+  }
+
+  /* Dismiss button */
+  .na-announcement__dismiss {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: rgba(238, 244, 251, 0.4);
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s ease;
+  }
+
+  .na-announcement__dismiss:hover {
+    color: var(--na-ice, #EEF4FB);
+  }
+
+  .na-announcement__dismiss svg {
+    width: 12px;
+    height: 12px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+  }
+
+  /* Hide entire bar when dismissed */
+  #na-announcement.is-dismissed {
+    display: none;
+  }
+
+  @media (max-width: 600px) {
+    .na-announcement__inner {
+      padding: 0 36px;
+      height: 36px;
+    }
+
+    .na-announcement__dots {
+      right: 32px;
+    }
+
+    .na-announcement__text,
+    .na-announcement__link {
+      font-size: 9px;
+    }
+  }
+</style>
+
+<div
+  id="na-announcement"
+  role="region"
+  aria-label="Announcements"
+  data-rotation-interval="{{ section.settings.rotation_interval | default: 4000 }}"
+>
+  <div class="na-announcement__inner">
+
+    {%- if section.settings.show_dismiss -%}
+      <button class="na-announcement__dismiss" id="na-announcement-dismiss" aria-label="Dismiss announcement">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    {%- endif -%}
+
+    <div class="na-announcement__track" aria-live="polite" aria-atomic="true">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'message' -%}
+          <div
+            class="na-announcement__message{% if forloop.first %} is-active{% endif %}"
+            data-index="{{ forloop.index0 }}"
+            {{ block.shopify_attributes }}
+          >
+            <span class="na-announcement__text">{{ block.settings.text }}</span>
+            {%- if block.settings.link_label != blank and block.settings.link_url != blank -%}
+              <a href="{{ block.settings.link_url }}" class="na-announcement__link">
+                {{ block.settings.link_label }} →
+              </a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    {%- if section.blocks.size > 1 -%}
+      <div class="na-announcement__dots" aria-hidden="true">
+        {%- for block in section.blocks -%}
+          <button
+            class="na-announcement__dot{% if forloop.first %} is-active{% endif %}"
+            data-target="{{ forloop.index0 }}"
+            aria-label="Go to message {{ forloop.index }}"
+          ></button>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+  </div>
+</div>
+
+<script>
+  (function () {
+    const bar      = document.getElementById('na-announcement');
+    if (!bar) return;
+
+    const messages = bar.querySelectorAll('.na-announcement__message');
+    const dots     = bar.querySelectorAll('.na-announcement__dot');
+    const dismiss  = document.getElementById('na-announcement-dismiss');
+    const interval = parseInt(bar.dataset.rotationInterval, 10) || 4000;
+    let current    = 0;
+    let timer      = null;
+
+    function show(index) {
+      messages[current].classList.remove('is-active');
+      if (dots[current]) dots[current].classList.remove('is-active');
+      current = (index + messages.length) % messages.length;
+      messages[current].classList.add('is-active');
+      if (dots[current]) dots[current].classList.add('is-active');
+    }
+
+    function startRotation() {
+      if (messages.length < 2) return;
+      timer = setInterval(() => show(current + 1), interval);
+    }
+
+    function stopRotation() {
+      clearInterval(timer);
+    }
+
+    // Dot click navigation
+    dots.forEach((dot) => {
+      dot.addEventListener('click', () => {
+        stopRotation();
+        show(parseInt(dot.dataset.target, 10));
+        startRotation();
+      });
+    });
+
+    // Dismiss
+    if (dismiss) {
+      dismiss.addEventListener('click', () => {
+        stopRotation();
+        bar.classList.add('is-dismissed');
+        // Persist dismissal for session
+        try { sessionStorage.setItem('na-announcement-dismissed', '1'); } catch(e) {}
+      });
+
+      // Restore dismissed state
+      try {
+        if (sessionStorage.getItem('na-announcement-dismissed') === '1') {
+          bar.classList.add('is-dismissed');
+        }
+      } catch(e) {}
+    }
+
+    startRotation();
+  })();
+</script>
+
+{%- endunless -%}
+
+{% schema %}
+{
+  "name": "Announcement bar",
+  "tag": "div",
+  "class": "na-announcement-section",
+  "settings": [
+    {
+      "type": "range",
+      "id": "rotation_interval",
+      "label": "Rotation speed (ms)",
+      "min": 2000,
+      "max": 8000,
+      "step": 500,
+      "default": 4000,
+      "info": "How long each message shows before rotating"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dismiss",
+      "label": "Show dismiss button",
+      "default": false
+    }
+  ],
+  "blocks": [
+    {
+      "type": "message",
+      "name": "Message",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Message text",
+          "default": "Free shipping on orders over $60"
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "Link label (optional)",
+          "default": "Shop Now"
+        },
+        {
+          "type": "url",
+          "id": "link_url",
+          "label": "Link URL (optional)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Announcement bar",
+      "blocks": [
+        {
+          "type": "message",
+          "settings": {
+            "text": "Free shipping on orders over $60"
+          }
+        },
+        {
+          "type": "message",
+          "settings": {
+            "text": "Same day dispatch · Easy returns"
+          }
+        }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "groups": ["header"]
+  }
+}
+{% endschema %}

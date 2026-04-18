@@ -1,0 +1,690 @@
+{% comment %}
+  Niche Aura — sections/main-product.liquid
+  Scheme 01 (Primary): Ice White bg · Deep Navy text · Electric Teal buttons
+  Used via templates/product.json
+{% endcomment %}
+
+<style>
+  /* ─── Product layout ─────────────────────────────────────────── */
+  .na-product {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: start;
+  }
+
+  /* ─── Breadcrumb ─────────────────────────────────────────────── */
+  .na-product__breadcrumb {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 300;
+    color: rgba(0, 45, 114, 0.4);
+    letter-spacing: 0.5px;
+    margin-bottom: -24px;
+  }
+
+  .na-product__breadcrumb a {
+    color: rgba(0, 45, 114, 0.4);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .na-product__breadcrumb a:hover {
+    color: var(--na-teal, #09CDCD);
+  }
+
+  .na-product__breadcrumb-sep {
+    opacity: 0.3;
+  }
+
+  /* ─── Gallery ────────────────────────────────────────────────── */
+  .na-product__gallery {
+    position: sticky;
+    top: calc(68px + 24px);
+  }
+
+  .na-product__gallery-main {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--na-b100, #D4E6F8);
+    position: relative;
+  }
+
+  .na-product__gallery-main img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .na-product__gallery-main:hover img {
+    transform: scale(1.03);
+  }
+
+  .na-product__gallery-thumbnails {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .na-product__gallery-thumb {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.2s ease;
+    background: var(--na-b100, #D4E6F8);
+  }
+
+  .na-product__gallery-thumb.is-active {
+    border-color: var(--na-teal, #09CDCD);
+  }
+
+  .na-product__gallery-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.2s ease;
+  }
+
+  .na-product__gallery-thumb:hover img {
+    opacity: 0.85;
+  }
+
+  /* ─── Info column ────────────────────────────────────────────── */
+  .na-product__info {
+    padding-top: 8px;
+  }
+
+  .na-product__vendor {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: var(--na-teal, #09CDCD);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .na-product__title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 32px;
+    letter-spacing: -0.8px;
+    color: var(--na-navy, #002D72);
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+
+  .na-product__price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .na-product__price {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--na-navy, #002D72);
+  }
+
+  .na-product__price--compare {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 300;
+    color: rgba(0, 45, 114, 0.35);
+    text-decoration: line-through;
+  }
+
+  .na-product__badge-sale {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 1px;
+    background: var(--na-violet, #81459E);
+    color: #EEF4FB;
+    padding: 3px 10px;
+    border-radius: 40px;
+  }
+
+  /* Divider */
+  .na-product__divider {
+    height: 1px;
+    background: var(--na-b100, #D4E6F8);
+    margin: 24px 0;
+  }
+
+  /* ─── Variant selectors ──────────────────────────────────────── */
+  .na-product__option-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 1.5px;
+    color: rgba(0, 45, 114, 0.5);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .na-product__option-label span {
+    color: var(--na-navy, #002D72);
+    font-style: normal;
+    margin-left: 6px;
+  }
+
+  .na-product__option-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .na-product__option-btn {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    padding: 8px 18px;
+    border-radius: 40px;
+    border: 1.5px solid var(--na-b100, #D4E6F8);
+    background: transparent;
+    color: var(--na-navy, #002D72);
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+  }
+
+  .na-product__option-btn:hover {
+    border-color: var(--na-navy, #002D72);
+  }
+
+  .na-product__option-btn.is-selected {
+    border-color: var(--na-teal, #09CDCD);
+    background: var(--na-teal, #09CDCD);
+    color: var(--na-navy, #002D72);
+  }
+
+  .na-product__option-btn.is-unavailable {
+    opacity: 0.3;
+    cursor: not-allowed;
+    text-decoration: line-through;
+  }
+
+  /* Quantity */
+  .na-product__quantity-wrap {
+    margin-bottom: 20px;
+  }
+
+  .na-product__quantity {
+    display: inline-flex;
+    align-items: center;
+    border: 1.5px solid var(--na-b100, #D4E6F8);
+    border-radius: 40px;
+    overflow: hidden;
+  }
+
+  .na-product__qty-btn {
+    background: none;
+    border: none;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--na-navy, #002D72);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+  }
+
+  .na-product__qty-btn:hover {
+    background: var(--na-b100, #D4E6F8);
+  }
+
+  .na-product__qty-input {
+    width: 48px;
+    text-align: center;
+    border: none;
+    border-left: 1.5px solid var(--na-b100, #D4E6F8);
+    border-right: 1.5px solid var(--na-b100, #D4E6F8);
+    background: none;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--na-navy, #002D72);
+    outline: none;
+    height: 40px;
+  }
+
+  /* Add to cart */
+  .na-product__atc {
+    width: 100%;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: var(--na-teal, #09CDCD);
+    color: var(--na-navy, #002D72);
+    border: none;
+    border-radius: 40px;
+    padding: 16px 32px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+    margin-bottom: 12px;
+  }
+
+  .na-product__atc:hover {
+    background: var(--na-sea-glass, #A0E5D9);
+  }
+
+  .na-product__atc:active {
+    transform: scale(0.98);
+  }
+
+  .na-product__atc:disabled {
+    background: var(--na-b100, #D4E6F8);
+    color: rgba(0, 45, 114, 0.35);
+    cursor: not-allowed;
+  }
+
+  /* Trust strip below ATC */
+  .na-product__trust {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+
+  .na-product__trust-item {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    color: rgba(0, 45, 114, 0.45);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* Description */
+  .na-product__description {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--na-navy, #002D72);
+    margin-top: 8px;
+  }
+
+  .na-product__description h2,
+  .na-product__description h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--na-navy, #002D72);
+    margin: 20px 0 8px;
+  }
+
+  .na-product__description ul,
+  .na-product__description ol {
+    padding-left: 18px;
+    margin: 8px 0;
+  }
+
+  .na-product__description li {
+    margin-bottom: 4px;
+  }
+
+  /* ─── Responsive ─────────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    .na-product {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+
+    .na-product__gallery {
+      position: static;
+    }
+
+    .na-product__breadcrumb {
+      margin-bottom: 0;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .na-product {
+      padding: 24px 16px 60px;
+    }
+
+    .na-product__title {
+      font-size: 26px;
+    }
+
+    .na-product__gallery-thumbnails {
+      grid-template-columns: repeat(5, 1fr);
+    }
+  }
+</style>
+
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign featured_media  = product.selected_or_first_available_variant.featured_media | default: product.featured_media
+-%}
+
+<div class="na-product">
+
+  {%- comment %} ── Breadcrumb ── {%- endcomment %}
+  <nav class="na-product__breadcrumb" aria-label="Breadcrumb">
+    <a href="{{ routes.root_url }}">Home</a>
+    <span class="na-product__breadcrumb-sep">/</span>
+    {%- if collection -%}
+      <a href="{{ collection.url }}">{{ collection.title }}</a>
+      <span class="na-product__breadcrumb-sep">/</span>
+    {%- endif -%}
+    <span>{{ product.title }}</span>
+  </nav>
+
+  {%- comment %} ── Gallery ── {%- endcomment %}
+  <div class="na-product__gallery">
+    <div class="na-product__gallery-main" id="na-gallery-main">
+      {%- if featured_media -%}
+        <img
+          src="{{ featured_media | image_url: width: 900 }}"
+          alt="{{ featured_media.alt | escape }}"
+          width="900"
+          height="900"
+          loading="eager"
+          id="na-gallery-main-img"
+        >
+      {%- endif -%}
+    </div>
+
+    {%- if product.media.size > 1 -%}
+      <div class="na-product__gallery-thumbnails" role="list">
+        {%- for media in product.media limit: 8 -%}
+          <button
+            class="na-product__gallery-thumb{% if media == featured_media %} is-active{% endif %}"
+            data-media-src="{{ media | image_url: width: 900 }}"
+            data-media-alt="{{ media.alt | escape }}"
+            aria-label="View image {{ forloop.index }}"
+            role="listitem"
+          >
+            <img
+              src="{{ media | image_url: width: 200 }}"
+              alt="{{ media.alt | escape }}"
+              width="200"
+              height="200"
+              loading="lazy"
+            >
+          </button>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- comment %} ── Product info ── {%- endcomment %}
+  <div class="na-product__info">
+
+    {%- if product.vendor != blank -%}
+      <span class="na-product__vendor">// {{ product.vendor }}</span>
+    {%- endif -%}
+
+    <h1 class="na-product__title">{{ product.title }}</h1>
+
+    {%- comment %} Price {%- endcomment %}
+    <div class="na-product__price-row" id="na-product-price">
+      <span class="na-product__price">
+        {{ current_variant.price | money }}
+      </span>
+      {%- if current_variant.compare_at_price > current_variant.price -%}
+        <span class="na-product__price--compare">{{ current_variant.compare_at_price | money }}</span>
+        <span class="na-product__badge-sale">// sale</span>
+      {%- endif -%}
+    </div>
+
+    <div class="na-product__divider"></div>
+
+    {%- comment %} Variant form {%- endcomment %}
+    {%- form 'product', product, id: 'na-product-form', novalidate: true -%}
+      <input type="hidden" name="id" value="{{ current_variant.id }}" id="na-variant-id">
+
+      {%- unless product.has_only_default_variant -%}
+        {%- for option in product.options_with_values -%}
+          <div class="na-product__option-group" data-option-index="{{ forloop.index0 }}">
+            <label class="na-product__option-label">
+              // {{ option.name }}<span id="na-option-val-{{ forloop.index0 }}">{{ option.selected_value }}</span>
+            </label>
+            <div class="na-product__option-buttons">
+              {%- for value in option.values -%}
+                <button
+                  type="button"
+                  class="na-product__option-btn{% if option.selected_value == value %} is-selected{% endif %}"
+                  data-option-index="{{ forloop.parentloop.index0 }}"
+                  data-value="{{ value | escape }}"
+                >
+                  {{ value }}
+                </button>
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- endfor -%}
+      {%- endunless -%}
+
+      {%- comment %} Quantity {%- endcomment %}
+      <div class="na-product__quantity-wrap">
+        <label class="na-product__option-label" for="na-qty">// quantity</label>
+        <div class="na-product__quantity">
+          <button type="button" class="na-product__qty-btn" id="na-qty-minus" aria-label="Decrease quantity">−</button>
+          <input
+            type="number"
+            id="na-qty"
+            name="quantity"
+            value="1"
+            min="1"
+            class="na-product__qty-input"
+            aria-label="Quantity"
+          >
+          <button type="button" class="na-product__qty-btn" id="na-qty-plus" aria-label="Increase quantity">+</button>
+        </div>
+      </div>
+
+      {%- comment %} Add to cart {%- endcomment %}
+      <button
+        type="submit"
+        name="add"
+        class="na-product__atc"
+        id="na-atc-btn"
+        {% unless current_variant.available %}disabled{% endunless %}
+      >
+        {%- if current_variant.available -%}
+          Add to Cart
+        {%- else -%}
+          Sold Out
+        {%- endif -%}
+      </button>
+
+    {%- endform -%}
+
+    {%- comment %} Trust strip {%- endcomment %}
+    <div class="na-product__trust">
+      <span class="na-product__trust-item">// free shipping over $60</span>
+      <span class="na-product__trust-item">// easy returns</span>
+      <span class="na-product__trust-item">// secure checkout</span>
+    </div>
+
+    <div class="na-product__divider"></div>
+
+    {%- comment %} Description {%- endcomment %}
+    {%- if product.description != blank -%}
+      <div class="na-product__description">
+        {{ product.description }}
+      </div>
+    {%- endif -%}
+
+  </div>{%- comment %} /.na-product__info {%- endcomment %}
+
+</div>
+
+<script>
+  (function () {
+    const product   = {{ product | json }};
+    const variants  = product.variants;
+
+    // ── Gallery thumbnails ────────────────────────────────────────
+    const mainImg   = document.getElementById('na-gallery-main-img');
+    const thumbs    = document.querySelectorAll('.na-product__gallery-thumb');
+
+    thumbs.forEach((thumb) => {
+      thumb.addEventListener('click', () => {
+        thumbs.forEach(t => t.classList.remove('is-active'));
+        thumb.classList.add('is-active');
+        if (mainImg) {
+          mainImg.src = thumb.dataset.mediaSrc;
+          mainImg.alt = thumb.dataset.mediaAlt;
+        }
+      });
+    });
+
+    // ── Variant selection ─────────────────────────────────────────
+    const optionGroups  = document.querySelectorAll('.na-product__option-group');
+    const variantInput  = document.getElementById('na-variant-id');
+    const atcBtn        = document.getElementById('na-atc-btn');
+    const priceRow      = document.getElementById('na-product-price');
+
+    let selectedOptions = Array.from(
+      document.querySelectorAll('.na-product__option-btn.is-selected'),
+      btn => btn.dataset.value
+    );
+
+    function findVariant(options) {
+      return variants.find(v =>
+        v.options.every((opt, i) => opt === options[i])
+      );
+    }
+
+    function formatMoney(cents) {
+      return '$' + (cents / 100).toFixed(2);
+    }
+
+    function updateVariant() {
+      const variant = findVariant(selectedOptions);
+      if (!variant) return;
+
+      // Update hidden input
+      if (variantInput) variantInput.value = variant.id;
+
+      // Update price
+      if (priceRow) {
+        let html = `<span class="na-product__price">${formatMoney(variant.price)}</span>`;
+        if (variant.compare_at_price > variant.price) {
+          html += `<span class="na-product__price--compare">${formatMoney(variant.compare_at_price)}</span>`;
+          html += `<span class="na-product__badge-sale">// sale</span>`;
+        }
+        priceRow.innerHTML = html;
+      }
+
+      // Update ATC button
+      if (atcBtn) {
+        atcBtn.disabled = !variant.available;
+        atcBtn.textContent = variant.available ? 'Add to Cart' : 'Sold Out';
+      }
+
+      // Update URL
+      const url = new URL(window.location);
+      url.searchParams.set('variant', variant.id);
+      history.replaceState({}, '', url);
+    }
+
+    optionGroups.forEach((group) => {
+      const btns = group.querySelectorAll('.na-product__option-btn');
+      const idx  = parseInt(group.dataset.optionIndex, 10);
+      const lbl  = document.getElementById(`na-option-val-${idx}`);
+
+      btns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          btns.forEach(b => b.classList.remove('is-selected'));
+          btn.classList.add('is-selected');
+          selectedOptions[idx] = btn.dataset.value;
+          if (lbl) lbl.textContent = btn.dataset.value;
+          updateVariant();
+        });
+      });
+    });
+
+    // ── Quantity stepper ──────────────────────────────────────────
+    const qtyInput = document.getElementById('na-qty');
+    document.getElementById('na-qty-minus')?.addEventListener('click', () => {
+      if (qtyInput && qtyInput.value > 1) qtyInput.value = parseInt(qtyInput.value) - 1;
+    });
+    document.getElementById('na-qty-plus')?.addEventListener('click', () => {
+      if (qtyInput) qtyInput.value = parseInt(qtyInput.value) + 1;
+    });
+
+    // ── Add to cart AJAX ──────────────────────────────────────────
+    const form = document.getElementById('na-product-form');
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!atcBtn || atcBtn.disabled) return;
+
+      atcBtn.textContent = '// adding…';
+      atcBtn.disabled = true;
+
+      const formData = new FormData(form);
+      const body = JSON.stringify({
+        id: formData.get('id'),
+        quantity: parseInt(formData.get('quantity')) || 1
+      });
+
+      try {
+        const res  = await fetch('/cart/add.js', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
+        const cart = await fetch('/cart.js').then(r => r.json());
+        document.dispatchEvent(new CustomEvent('cart:updated', { detail: { itemCount: cart.item_count } }));
+        atcBtn.textContent = '✓ Added';
+        setTimeout(() => {
+          atcBtn.textContent = 'Add to Cart';
+          atcBtn.disabled = false;
+        }, 1800);
+      } catch (err) {
+        atcBtn.textContent = 'Try Again';
+        atcBtn.disabled = false;
+      }
+    });
+
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Product information",
+  "tag": "section",
+  "settings": [],
+  "blocks": [],
+  "enabled_on": {
+    "templates": ["product"]
+  }
+}
+{% endschema %}

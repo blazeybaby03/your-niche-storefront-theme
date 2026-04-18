@@ -1,0 +1,251 @@
+{% comment %}
+  Niche Aura — sections/cart-upsell.liquid
+  Scheme 04 (Soft Blue): B-100 bg · Deep Navy text
+  Cross-sell / upsell recommendations shown in the cart.
+  Include in templates/cart.json after "main" section.
+  Emma selects which products to show in the theme editor.
+{% endcomment %}
+
+<style>
+  .na-cart-upsell {
+    background: var(--na-b100, #D4E6F8);
+    border-top: 1px solid var(--na-b200, #A9CCF0);
+    padding: 48px 24px 64px;
+  }
+
+  .na-cart-upsell__inner {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  .na-cart-upsell__eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: var(--na-b400, #4A91DC);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .na-cart-upsell__heading {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: -0.4px;
+    color: var(--na-navy, #002D72);
+    margin-bottom: 28px;
+  }
+
+  /* ─── Horizontal scroll grid ─────────────────────────────────── */
+  .na-cart-upsell__track {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  /* ─── Upsell card ────────────────────────────────────────────── */
+  .na-upsell-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--na-b200, #A9CCF0);
+    overflow: hidden;
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .na-upsell-card:hover {
+    border-color: var(--na-teal, #09CDCD);
+    box-shadow: 0 2px 12px rgba(9,205,205,0.15);
+  }
+
+  .na-upsell-card__img {
+    width: 64px;
+    height: 64px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: var(--na-b100, #D4E6F8);
+    flex-shrink: 0;
+  }
+
+  .na-upsell-card__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .na-upsell-card__title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: -0.1px;
+    color: var(--na-navy, #002D72);
+    margin-bottom: 4px;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .na-upsell-card__price {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--na-navy, #002D72);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .na-upsell-card__add {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    background: var(--na-navy, #002D72);
+    color: var(--na-ice, #EEF4FB);
+    border: none;
+    border-radius: 40px;
+    padding: 6px 12px;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s ease;
+  }
+
+  .na-upsell-card__add:hover {
+    background: var(--na-teal, #09CDCD);
+    color: var(--na-navy, #002D72);
+  }
+
+  /* ─── Responsive ─────────────────────────────────────────────── */
+  @media (max-width: 960px) {
+    .na-cart-upsell__track { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 480px) {
+    .na-cart-upsell { padding: 32px 16px 48px; }
+    .na-cart-upsell__track { grid-template-columns: 1fr; }
+  }
+</style>
+
+{%- if section.blocks.size > 0 -%}
+<section class="na-cart-upsell">
+  <div class="na-cart-upsell__inner">
+    <span class="na-cart-upsell__eyebrow">// {{ section.settings.eyebrow | default: 'you might also like' }}</span>
+    <h2 class="na-cart-upsell__heading">{{ section.settings.heading | default: 'Complete Your Order' }}</h2>
+
+    <div class="na-cart-upsell__track">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'product' -%}
+          {%- assign up_product = block.settings.product -%}
+          {%- if up_product != blank -%}
+            <div class="na-upsell-card" {{ block.shopify_attributes }}>
+              {%- if up_product.featured_image -%}
+                <img
+                  class="na-upsell-card__img"
+                  src="{{ up_product.featured_image | image_url: width: 128 }}"
+                  alt="{{ up_product.featured_image.alt | escape }}"
+                  width="64" height="64"
+                  loading="lazy"
+                >
+              {%- else -%}
+                <div class="na-upsell-card__img"></div>
+              {%- endif -%}
+              <div class="na-upsell-card__info">
+                <p class="na-upsell-card__title">{{ up_product.title }}</p>
+                <span class="na-upsell-card__price">{{ up_product.price | money }}</span>
+                <button
+                  class="na-upsell-card__add"
+                  data-variant-id="{{ up_product.variants.first.id }}"
+                  {% unless up_product.available %}disabled{% endunless %}
+                  aria-label="Add {{ up_product.title }} to cart"
+                >
+                  {%- if up_product.available -%}+ Add{%- else -%}Sold out{%- endif -%}
+                </button>
+              </div>
+            </div>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+{%- endif -%}
+
+<script>
+  document.querySelectorAll('.na-upsell-card__add').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (btn.disabled) return;
+      btn.textContent = '// adding…';
+      btn.disabled = true;
+      try {
+        await fetch('/cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: btn.dataset.variantId, quantity: 1 })
+        });
+        const cart = await fetch('/cart.js').then(r => r.json());
+        document.dispatchEvent(new CustomEvent('cart:updated', { detail: { itemCount: cart.item_count } }));
+        btn.textContent = '✓ Added';
+        setTimeout(() => { btn.textContent = '+ Add'; btn.disabled = false; }, 1800);
+        // Reload cart totals
+        setTimeout(() => window.location.reload(), 600);
+      } catch {
+        btn.textContent = 'Try again';
+        btn.disabled = false;
+      }
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Cart upsell",
+  "tag": "div",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow label",
+      "default": "you might also like"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section heading",
+      "default": "Complete Your Order"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product to recommend"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cart upsell",
+      "blocks": [
+        { "type": "product" },
+        { "type": "product" }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "templates": ["cart"]
+  }
+}
+{% endschema %}

@@ -1,0 +1,414 @@
+{% comment %}
+  Niche Aura — sections/hero.liquid
+  Scheme 03 (Campaign): Violet Haze bg · Ice White text · Teal/Ice CTA
+  Full-width hero banner for the home page.
+  Emma selects image, headline, subheading, and CTA in the theme editor.
+  Include in templates/index.json between header and featured-products.
+{% endcomment %}
+
+<style>
+  /* ─── Hero wrapper ───────────────────────────────────────────── */
+  .na-hero {
+    position: relative;
+    min-height: 640px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    background: var(--na-violet, #81459E);
+  }
+
+  /* ─── Background image ───────────────────────────────────────── */
+  .na-hero__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    z-index: 0;
+  }
+
+  /* Dark overlay so text always reads on top of the image */
+  .na-hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(129, 69, 158, 0.82) 0%,
+      rgba(2, 45, 114, 0.55) 100%
+    );
+    z-index: 1;
+  }
+
+  /* No image — show solid Violet Haze */
+  .na-hero--no-image .na-hero__overlay {
+    background: var(--na-violet, #81459E);
+  }
+
+  /* ─── Content ────────────────────────────────────────────────── */
+  .na-hero__inner {
+    position: relative;
+    z-index: 2;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 120px 24px 100px;
+    width: 100%;
+  }
+
+  .na-hero__content {
+    max-width: 620px;
+  }
+
+  .na-hero__eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 2.5px;
+    color: var(--na-sea-glass, #A0E5D9);
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .na-hero__heading {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: clamp(36px, 5vw, 64px);
+    letter-spacing: -1.5px;
+    line-height: 1.0;
+    color: var(--na-ice, #EEF4FB);
+    margin-bottom: 20px;
+  }
+
+  .na-hero__subheading {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-style: italic;
+    font-size: clamp(18px, 2.2vw, 24px);
+    line-height: 1.5;
+    color: rgba(238, 244, 251, 0.80);
+    margin-bottom: 40px;
+    max-width: 480px;
+  }
+
+  /* ─── CTA row ────────────────────────────────────────────────── */
+  .na-hero__cta-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .na-hero__cta-primary {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: var(--na-ice, #EEF4FB);
+    color: var(--na-violet, #81459E);
+    border: 2px solid var(--na-ice, #EEF4FB);
+    border-radius: 40px;
+    padding: 14px 32px;
+    text-decoration: none;
+    transition: background 0.25s ease, color 0.25s ease;
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  .na-hero__cta-primary:hover {
+    background: transparent;
+    color: var(--na-ice, #EEF4FB);
+  }
+
+  .na-hero__cta-secondary {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 1.5px;
+    color: var(--na-sea-glass, #A0E5D9);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(160, 229, 217, 0.35);
+    padding-bottom: 2px;
+    white-space: nowrap;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .na-hero__cta-secondary:hover {
+    color: var(--na-ice, #EEF4FB);
+    border-color: rgba(238, 244, 251, 0.5);
+  }
+
+  /* ─── Scroll indicator ───────────────────────────────────────── */
+  .na-hero__scroll {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    opacity: 0.5;
+  }
+
+  .na-hero__scroll-line {
+    width: 1px;
+    height: 40px;
+    background: var(--na-ice, #EEF4FB);
+    animation: na-scroll-pulse 1.8s ease-in-out infinite;
+  }
+
+  .na-hero__scroll-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7px;
+    letter-spacing: 2px;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--na-ice, #EEF4FB);
+    text-transform: lowercase;
+  }
+
+  @keyframes na-scroll-pulse {
+    0%, 100% { transform: scaleY(1); opacity: 1; }
+    50%       { transform: scaleY(0.6); opacity: 0.4; }
+  }
+
+  /* ─── Content alignment variants ────────────────────────────── */
+  .na-hero--center .na-hero__content {
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .na-hero--center .na-hero__cta-row {
+    justify-content: center;
+  }
+
+  .na-hero--center .na-hero__subheading {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .na-hero--right .na-hero__content {
+    margin-left: auto;
+    text-align: right;
+  }
+
+  .na-hero--right .na-hero__cta-row {
+    justify-content: flex-end;
+  }
+
+  /* ─── Responsive ─────────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .na-hero {
+      min-height: 520px;
+    }
+
+    .na-hero__inner {
+      padding: 80px 20px 72px;
+    }
+
+    .na-hero__content {
+      max-width: 100%;
+    }
+
+    .na-hero__overlay {
+      background: linear-gradient(
+        160deg,
+        rgba(129, 69, 158, 0.88) 0%,
+        rgba(2, 45, 114, 0.65) 100%
+      );
+    }
+  }
+
+  @media (max-width: 480px) {
+    .na-hero {
+      min-height: 460px;
+    }
+
+    .na-hero__inner {
+      padding: 64px 16px 60px;
+    }
+
+    .na-hero__cta-row {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .na-hero--center .na-hero__cta-row {
+      align-items: center;
+    }
+  }
+</style>
+
+{%- liquid
+  assign eyebrow       = section.settings.eyebrow | default: 'new arrivals'
+  assign heading       = section.settings.heading | default: 'Your Niche, Perfected.'
+  assign subheading    = section.settings.subheading | default: 'Curated essentials for the life you're building.'
+  assign cta_label     = section.settings.cta_label | default: 'Shop Now'
+  assign cta_url       = section.settings.cta_url | default: routes.all_products_collection_url
+  assign cta2_label    = section.settings.cta2_label
+  assign cta2_url      = section.settings.cta2_url
+  assign alignment     = section.settings.alignment | default: 'left'
+  assign show_scroll   = section.settings.show_scroll_indicator
+  assign hero_image    = section.settings.image
+-%}
+
+<section
+  class="na-hero na-hero--{{ alignment }}{% unless hero_image %} na-hero--no-image{% endunless %}"
+  id="na-hero-section"
+  aria-label="{{ heading | escape }}"
+>
+  {%- if hero_image -%}
+    <img
+      class="na-hero__bg"
+      src="{{ hero_image | image_url: width: 2400 }}"
+      srcset="
+        {{ hero_image | image_url: width: 800 }} 800w,
+        {{ hero_image | image_url: width: 1200 }} 1200w,
+        {{ hero_image | image_url: width: 1800 }} 1800w,
+        {{ hero_image | image_url: width: 2400 }} 2400w
+      "
+      sizes="100vw"
+      alt="{{ hero_image.alt | escape | default: heading }}"
+      width="2400"
+      height="1350"
+      loading="eager"
+      fetchpriority="high"
+    >
+  {%- endif -%}
+
+  <div class="na-hero__overlay" aria-hidden="true"></div>
+
+  <div class="na-hero__inner">
+    <div class="na-hero__content">
+      {%- if eyebrow != blank -%}
+        <span class="na-hero__eyebrow">// {{ eyebrow }}</span>
+      {%- endif -%}
+
+      <h1 class="na-hero__heading">{{ heading }}</h1>
+
+      {%- if subheading != blank -%}
+        <p class="na-hero__subheading">{{ subheading }}</p>
+      {%- endif -%}
+
+      <div class="na-hero__cta-row">
+        <a href="{{ cta_url }}" class="na-hero__cta-primary">{{ cta_label }}</a>
+        {%- if cta2_label != blank and cta2_url != blank -%}
+          <a href="{{ cta2_url }}" class="na-hero__cta-secondary">{{ cta2_label }} →</a>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+
+  {%- if show_scroll -%}
+    <div class="na-hero__scroll" aria-hidden="true">
+      <span class="na-hero__scroll-line"></span>
+      <span class="na-hero__scroll-label">scroll</span>
+    </div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Hero banner",
+  "tag": "div",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background image",
+      "info": "Recommended: 2400 × 1350px (16:9). Without an image, the section uses Violet Haze."
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow label",
+      "default": "new arrivals",
+      "info": "Small label above the headline (shown as // label)"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Headline",
+      "default": "Your Niche, Perfected."
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Curated essentials for the life you're building."
+    },
+    {
+      "type": "header",
+      "content": "Primary CTA"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button label",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Button destination",
+      "info": "Defaults to all products if left blank"
+    },
+    {
+      "type": "header",
+      "content": "Secondary CTA (optional)"
+    },
+    {
+      "type": "text",
+      "id": "cta2_label",
+      "label": "Secondary link label",
+      "info": "Leave blank to hide"
+    },
+    {
+      "type": "url",
+      "id": "cta2_url",
+      "label": "Secondary link destination"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Content alignment",
+      "options": [
+        { "value": "left",   "label": "Left" },
+        { "value": "center", "label": "Centre" },
+        { "value": "right",  "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_scroll_indicator",
+      "label": "Show scroll indicator",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero banner"
+    }
+  ],
+  "enabled_on": {
+    "templates": ["index"]
+  }
+}
+{% endschema %}

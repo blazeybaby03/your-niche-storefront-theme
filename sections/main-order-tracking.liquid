@@ -1,0 +1,600 @@
+{% comment %}
+  Niche Aura — sections/main-order-tracking.liquid
+  Scheme 01 (Primary): Ice White bg · Deep Navy text · Electric Teal accents
+  Covers: Order status page template + Order lookup form (Tasks #33 & #34)
+  Used via templates/page.order-tracking.json
+{% endcomment %}
+
+<style>
+  /* ─── Page shell ─────────────────────────────────────────────── */
+  .na-tracking {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 72px 24px 100px;
+  }
+
+  .na-tracking__eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: var(--na-teal, #09CDCD);
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .na-tracking__heading {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 36px;
+    letter-spacing: -0.8px;
+    color: var(--na-navy, #002D72);
+    margin-bottom: 12px;
+  }
+
+  .na-tracking__sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    font-weight: 300;
+    font-style: italic;
+    color: rgba(0, 45, 114, 0.55);
+    margin-bottom: 48px;
+    line-height: 1.6;
+  }
+
+  /* ─── Lookup form card ───────────────────────────────────────── */
+  .na-tracking__card {
+    background: white;
+    border: 1px solid var(--na-b100, #D4E6F8);
+    border-radius: 20px;
+    padding: 40px 36px;
+    margin-bottom: 48px;
+  }
+
+  .na-tracking__field {
+    margin-bottom: 20px;
+  }
+
+  .na-tracking__label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 1.5px;
+    color: rgba(0, 45, 114, 0.45);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .na-tracking__input {
+    width: 100%;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--na-navy, #002D72);
+    background: var(--na-ice, #EEF4FB);
+    border: 1.5px solid var(--na-b100, #D4E6F8);
+    border-radius: 10px;
+    padding: 12px 16px;
+    outline: none;
+    transition: border-color 0.2s ease;
+    caret-color: var(--na-teal, #09CDCD);
+  }
+
+  .na-tracking__input::placeholder {
+    opacity: 0.35;
+  }
+
+  .na-tracking__input:focus {
+    border-color: var(--na-teal, #09CDCD);
+    background: white;
+  }
+
+  .na-tracking__input.is-error {
+    border-color: var(--na-violet, #81459E);
+  }
+
+  .na-tracking__error-msg {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--na-violet, #81459E);
+    margin-top: 6px;
+    display: none;
+  }
+
+  .na-tracking__input.is-error + .na-tracking__error-msg {
+    display: block;
+  }
+
+  .na-tracking__submit {
+    width: 100%;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: var(--na-teal, #09CDCD);
+    color: var(--na-navy, #002D72);
+    border: none;
+    border-radius: 40px;
+    padding: 16px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s ease, transform 0.1s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .na-tracking__submit:hover {
+    background: var(--na-sea-glass, #A0E5D9);
+  }
+
+  .na-tracking__submit:active {
+    transform: scale(0.98);
+  }
+
+  .na-tracking__submit:disabled {
+    background: var(--na-b100, #D4E6F8);
+    cursor: not-allowed;
+  }
+
+  .na-tracking__submit-icon {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Loading spinner */
+  .na-tracking__spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(0, 45, 114, 0.2);
+    border-top-color: var(--na-navy, #002D72);
+    border-radius: 50%;
+    animation: na-spin 0.7s linear infinite;
+    display: none;
+  }
+
+  @keyframes na-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ─── Results area ───────────────────────────────────────────── */
+  .na-tracking__results {
+    display: none;
+    animation: na-fadein 0.4s ease;
+  }
+
+  .na-tracking__results.is-visible {
+    display: block;
+  }
+
+  @keyframes na-fadein {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .na-tracking__result-card {
+    background: white;
+    border: 1px solid var(--na-b100, #D4E6F8);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .na-tracking__result-header {
+    background: var(--na-navy, #002D72);
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .na-tracking__result-order-num {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 15px;
+    color: var(--na-ice, #EEF4FB);
+    letter-spacing: -0.3px;
+  }
+
+  .na-tracking__result-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 1px;
+    padding: 5px 14px;
+    border-radius: 40px;
+  }
+
+  .na-tracking__result-status--fulfilled {
+    background: var(--na-teal, #09CDCD);
+    color: var(--na-navy, #002D72);
+  }
+
+  .na-tracking__result-status--unfulfilled {
+    background: rgba(238, 244, 251, 0.15);
+    color: var(--na-sea-glass, #A0E5D9);
+  }
+
+  .na-tracking__result-body {
+    padding: 24px;
+  }
+
+  .na-tracking__result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--na-b100, #D4E6F8);
+  }
+
+  .na-tracking__result-row:last-child {
+    border-bottom: none;
+  }
+
+  .na-tracking__result-key {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    color: rgba(0, 45, 114, 0.4);
+  }
+
+  .na-tracking__result-val {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--na-navy, #002D72);
+    text-align: right;
+  }
+
+  .na-tracking__tracking-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    background: var(--na-teal, #09CDCD);
+    color: var(--na-navy, #002D72);
+    border-radius: 40px;
+    padding: 12px 24px;
+    text-decoration: none;
+    margin-top: 20px;
+    display: inline-flex;
+    transition: background 0.2s ease;
+  }
+
+  .na-tracking__tracking-link:hover {
+    background: var(--na-sea-glass, #A0E5D9);
+  }
+
+  /* Not found state */
+  .na-tracking__not-found {
+    text-align: center;
+    padding: 40px 24px;
+    display: none;
+  }
+
+  .na-tracking__not-found.is-visible {
+    display: block;
+  }
+
+  .na-tracking__not-found-msg {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    font-weight: 300;
+    font-style: italic;
+    color: rgba(0, 45, 114, 0.5);
+    margin-bottom: 8px;
+  }
+
+  .na-tracking__not-found-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    color: rgba(0, 45, 114, 0.3);
+  }
+
+  /* ─── Help strip ─────────────────────────────────────────────── */
+  .na-tracking__help {
+    text-align: center;
+    margin-top: 32px;
+  }
+
+  .na-tracking__help-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    font-weight: 300;
+    font-style: italic;
+    color: rgba(0, 45, 114, 0.45);
+  }
+
+  .na-tracking__help-link {
+    color: var(--na-teal, #09CDCD);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(9, 205, 205, 0.4);
+    transition: border-color 0.2s ease;
+  }
+
+  .na-tracking__help-link:hover {
+    border-color: var(--na-teal, #09CDCD);
+  }
+
+  @media (max-width: 480px) {
+    .na-tracking {
+      padding: 48px 16px 80px;
+    }
+
+    .na-tracking__card {
+      padding: 28px 20px;
+    }
+
+    .na-tracking__heading {
+      font-size: 28px;
+    }
+  }
+</style>
+
+<section class="na-tracking">
+  <span class="na-tracking__eyebrow">// order tracking</span>
+  <h1 class="na-tracking__heading">{{ section.settings.heading | default: 'Track Your Order' }}</h1>
+  <p class="na-tracking__sub">{{ section.settings.subtext | default: 'Enter your order number and email address to check on your delivery.' }}</p>
+
+  {%- comment %} ── Lookup form ── {%- endcomment %}
+  <div class="na-tracking__card">
+    <form id="na-tracking-form" novalidate>
+
+      <div class="na-tracking__field">
+        <label class="na-tracking__label" for="na-order-number">// order number</label>
+        <input
+          type="text"
+          id="na-order-number"
+          class="na-tracking__input"
+          placeholder="#NA1234"
+          autocomplete="off"
+          autocorrect="off"
+          inputmode="numeric"
+          aria-required="true"
+          aria-describedby="na-order-number-error"
+        >
+        <span class="na-tracking__error-msg" id="na-order-number-error" role="alert">
+          // please enter your order number
+        </span>
+      </div>
+
+      <div class="na-tracking__field">
+        <label class="na-tracking__label" for="na-order-email">// email address</label>
+        <input
+          type="email"
+          id="na-order-email"
+          class="na-tracking__input"
+          placeholder="your@email.com"
+          autocomplete="email"
+          aria-required="true"
+          aria-describedby="na-order-email-error"
+        >
+        <span class="na-tracking__error-msg" id="na-order-email-error" role="alert">
+          // please enter a valid email address
+        </span>
+      </div>
+
+      <button type="submit" class="na-tracking__submit" id="na-tracking-submit">
+        <svg class="na-tracking__submit-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/>
+          <line x1="16.5" y1="16.5" x2="22" y2="22"/>
+        </svg>
+        <span id="na-tracking-btn-label">{{ section.settings.cta | default: 'Track My Order' }}</span>
+        <span class="na-tracking__spinner" id="na-tracking-spinner"></span>
+      </button>
+
+    </form>
+  </div>
+
+  {%- comment %} ── Results ── {%- endcomment %}
+  <div class="na-tracking__results" id="na-tracking-results" aria-live="polite">
+    <div class="na-tracking__result-card">
+      <div class="na-tracking__result-header">
+        <span class="na-tracking__result-order-num" id="na-result-order-num"></span>
+        <span class="na-tracking__result-status" id="na-result-status"></span>
+      </div>
+      <div class="na-tracking__result-body">
+        <div class="na-tracking__result-row">
+          <span class="na-tracking__result-key">// date placed</span>
+          <span class="na-tracking__result-val" id="na-result-date"></span>
+        </div>
+        <div class="na-tracking__result-row">
+          <span class="na-tracking__result-key">// items</span>
+          <span class="na-tracking__result-val" id="na-result-items"></span>
+        </div>
+        <div class="na-tracking__result-row">
+          <span class="na-tracking__result-key">// total</span>
+          <span class="na-tracking__result-val" id="na-result-total"></span>
+        </div>
+        <div class="na-tracking__result-row" id="na-result-tracking-row">
+          <span class="na-tracking__result-key">// tracking number</span>
+          <span class="na-tracking__result-val" id="na-result-tracking-num"></span>
+        </div>
+        <div style="margin-top: 8px;">
+          <a href="#" class="na-tracking__tracking-link" id="na-result-tracking-link" style="display:none;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            Track with carrier
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {%- comment %} ── Not found ── {%- endcomment %}
+  <div class="na-tracking__not-found" id="na-tracking-not-found" aria-live="polite">
+    <p class="na-tracking__not-found-msg">We couldn't find that order.</p>
+    <p class="na-tracking__not-found-sub">// double-check your order number and email, then try again</p>
+  </div>
+
+  {%- comment %} ── Help ── {%- endcomment %}
+  <div class="na-tracking__help">
+    <p class="na-tracking__help-text">
+      Need help? <a href="/pages/contact" class="na-tracking__help-link">{{ section.settings.help_link_label | default: 'Contact us' }}</a>
+    </p>
+  </div>
+
+</section>
+
+<script>
+  (function () {
+    const form        = document.getElementById('na-tracking-form');
+    const orderInput  = document.getElementById('na-order-number');
+    const emailInput  = document.getElementById('na-order-email');
+    const submitBtn   = document.getElementById('na-tracking-submit');
+    const btnLabel    = document.getElementById('na-tracking-btn-label');
+    const spinner     = document.getElementById('na-tracking-spinner');
+    const results     = document.getElementById('na-tracking-results');
+    const notFound    = document.getElementById('na-tracking-not-found');
+
+    // Validation helpers
+    function setError(input, bool) {
+      input.classList.toggle('is-error', bool);
+    }
+
+    function validateEmail(val) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+    }
+
+    function setLoading(loading) {
+      submitBtn.disabled = loading;
+      btnLabel.style.display = loading ? 'none' : 'inline';
+      spinner.style.display  = loading ? 'block' : 'none';
+    }
+
+    function showResults(order) {
+      // Populate result card
+      document.getElementById('na-result-order-num').textContent  = `Order ${order.name}`;
+      document.getElementById('na-result-date').textContent       = new Date(order.created_at).toLocaleDateString('en-AU', { year:'numeric', month:'long', day:'numeric' });
+      document.getElementById('na-result-items').textContent      = `${order.line_items_count} item${order.line_items_count !== 1 ? 's' : ''}`;
+      document.getElementById('na-result-total').textContent      = order.total_price_set || order.total_price;
+
+      const statusEl = document.getElementById('na-result-status');
+      const fulfilled = order.fulfillment_status === 'fulfilled';
+      statusEl.textContent  = fulfilled ? '// fulfilled' : '// processing';
+      statusEl.className    = `na-tracking__result-status ${fulfilled ? 'na-tracking__result-status--fulfilled' : 'na-tracking__result-status--unfulfilled'}`;
+
+      // Tracking link
+      if (order.tracking_number && order.tracking_url) {
+        document.getElementById('na-result-tracking-num').textContent = order.tracking_number;
+        const trackLink = document.getElementById('na-result-tracking-link');
+        trackLink.href = order.tracking_url;
+        trackLink.style.display = 'inline-flex';
+        trackLink.target = '_blank';
+        trackLink.rel = 'noopener';
+      } else {
+        document.getElementById('na-result-tracking-row').style.display = 'none';
+      }
+
+      results.classList.add('is-visible');
+      notFound.classList.remove('is-visible');
+      results.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const orderVal = orderInput.value.trim().replace(/^#/, '');
+      const emailVal = emailInput.value.trim();
+
+      let valid = true;
+      if (!orderVal) { setError(orderInput, true); valid = false; } else { setError(orderInput, false); }
+      if (!validateEmail(emailVal)) { setError(emailInput, true); valid = false; } else { setError(emailInput, false); }
+      if (!valid) return;
+
+      setLoading(true);
+      results.classList.remove('is-visible');
+      notFound.classList.remove('is-visible');
+
+      try {
+        // Use Shopify's Order Status page lookup endpoint
+        // Note: full order lookup requires a Shopify app or the Order Status page URL.
+        // This implementation redirects to Shopify's native order status page.
+        const statusUrl = `/a/orders?order_id=${encodeURIComponent(orderVal)}&email=${encodeURIComponent(emailVal)}`;
+
+        // Attempt native Shopify order lookup
+        const res = await fetch(statusUrl, { headers: { 'Accept': 'application/json' } });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.order) {
+            showResults(data.order);
+          } else {
+            // Redirect to Shopify's native order status page as fallback
+            window.location.href = statusUrl;
+          }
+        } else {
+          notFound.classList.add('is-visible');
+        }
+      } catch {
+        notFound.classList.add('is-visible');
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    // Clear errors on input
+    [orderInput, emailInput].forEach(input => {
+      input.addEventListener('input', () => setError(input, false));
+    });
+
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Order tracking",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Page heading",
+      "default": "Track Your Order"
+    },
+    {
+      "type": "text",
+      "id": "subtext",
+      "label": "Subtext",
+      "default": "Enter your order number and email address to check on your delivery."
+    },
+    {
+      "type": "text",
+      "id": "cta",
+      "label": "Submit button label",
+      "default": "Track My Order"
+    },
+    {
+      "type": "text",
+      "id": "help_link_label",
+      "label": "Help link label",
+      "default": "Contact us"
+    }
+  ],
+  "blocks": [],
+  "enabled_on": {
+    "templates": ["page"]
+  }
+}
+{% endschema %}

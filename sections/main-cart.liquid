@@ -1,0 +1,850 @@
+{% comment %}
+  Niche Aura — sections/main-cart.liquid
+  Scheme 01 (Primary): Ice White bg · Deep Navy text · Electric Teal accents
+  Covers: Cart page layout · Discount code field · Checkout CTA · Empty state
+  Used via templates/cart.json
+{% endcomment %}
+
+<style>
+  /* ─── Page shell ─────────────────────────────────────────────── */
+  .na-cart-page {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 56px 24px 100px;
+    min-height: 60vh;
+  }
+
+  .na-cart-page__eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: var(--na-teal, #09CDCD);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .na-cart-page__heading {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 36px;
+    letter-spacing: -0.8px;
+    color: var(--na-navy, #002D72);
+    margin-bottom: 40px;
+  }
+
+  /* ─── Two-column layout ──────────────────────────────────────── */
+  .na-cart-layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 48px;
+    align-items: start;
+  }
+
+  /* ─── Items column ───────────────────────────────────────────── */
+  .na-cart-items__header {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    gap: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1.5px solid var(--na-b100, #D4E6F8);
+    margin-bottom: 4px;
+  }
+
+  .na-cart-items__col-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 1.5px;
+    color: rgba(0, 45, 114, 0.35);
+    text-transform: uppercase;
+  }
+
+  .na-cart-items__col-label--right {
+    text-align: right;
+  }
+
+  /* ─── Cart line item ─────────────────────────────────────────── */
+  .na-cart-item {
+    display: grid;
+    grid-template-columns: 88px 1fr auto auto auto;
+    gap: 16px;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--na-b100, #D4E6F8);
+  }
+
+  .na-cart-item__image {
+    width: 88px;
+    height: 88px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--na-b100, #D4E6F8);
+    flex-shrink: 0;
+  }
+
+  .na-cart-item__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .na-cart-item__title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: -0.2px;
+    color: var(--na-navy, #002D72);
+    margin-bottom: 4px;
+    text-decoration: none;
+    display: block;
+    transition: color 0.2s ease;
+  }
+
+  .na-cart-item__title:hover {
+    color: var(--na-teal, #09CDCD);
+  }
+
+  .na-cart-item__variant {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    color: rgba(0, 45, 114, 0.4);
+  }
+
+  .na-cart-item__price {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--na-navy, #002D72);
+    white-space: nowrap;
+  }
+
+  /* Quantity stepper (inline) */
+  .na-cart-item__qty {
+    display: flex;
+    align-items: center;
+    border: 1.5px solid var(--na-b100, #D4E6F8);
+    border-radius: 40px;
+    overflow: hidden;
+  }
+
+  .na-cart-item__qty-btn {
+    background: none;
+    border: none;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--na-navy, #002D72);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+  }
+
+  .na-cart-item__qty-btn:hover {
+    background: var(--na-b100, #D4E6F8);
+  }
+
+  .na-cart-item__qty-input {
+    width: 36px;
+    text-align: center;
+    border: none;
+    border-left: 1.5px solid var(--na-b100, #D4E6F8);
+    border-right: 1.5px solid var(--na-b100, #D4E6F8);
+    background: none;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--na-navy, #002D72);
+    outline: none;
+    height: 32px;
+  }
+
+  /* Line total */
+  .na-cart-item__line-price {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 14px;
+    color: var(--na-navy, #002D72);
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  /* Remove button */
+  .na-cart-item__remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: rgba(0, 45, 114, 0.25);
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s ease;
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  .na-cart-item__remove:hover {
+    color: var(--na-violet, #81459E);
+  }
+
+  /* ─── Discount / promo code ──────────────────────────────────── */
+  .na-cart-discount {
+    margin-top: 24px;
+  }
+
+  .na-cart-discount__toggle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 1px;
+    color: var(--na-teal, #09CDCD);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: opacity 0.2s ease;
+  }
+
+  .na-cart-discount__toggle:hover {
+    opacity: 0.75;
+  }
+
+  .na-cart-discount__form {
+    display: flex;
+    gap: 0;
+    margin-top: 12px;
+    max-width: 340px;
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease;
+  }
+
+  .na-cart-discount__form.is-open {
+    max-height: 60px;
+  }
+
+  .na-cart-discount__input {
+    flex: 1;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    font-style: italic;
+    font-weight: 300;
+    border: 1.5px solid var(--na-b100, #D4E6F8);
+    border-right: none;
+    border-radius: 40px 0 0 40px;
+    padding: 10px 18px;
+    background: white;
+    color: var(--na-navy, #002D72);
+    outline: none;
+    transition: border-color 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .na-cart-discount__input::placeholder {
+    text-transform: none;
+    letter-spacing: 0;
+    opacity: 0.45;
+  }
+
+  .na-cart-discount__input:focus {
+    border-color: var(--na-teal, #09CDCD);
+  }
+
+  .na-cart-discount__apply {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    background: var(--na-navy, #002D72);
+    color: var(--na-ice, #EEF4FB);
+    border: none;
+    border-radius: 0 40px 40px 0;
+    padding: 10px 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s ease;
+  }
+
+  .na-cart-discount__apply:hover {
+    background: var(--na-teal, #09CDCD);
+    color: var(--na-navy, #002D72);
+  }
+
+  .na-cart-discount__feedback {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    margin-top: 8px;
+    display: none;
+  }
+
+  .na-cart-discount__feedback.is-success { color: var(--na-teal, #09CDCD); display: block; }
+  .na-cart-discount__feedback.is-error   { color: var(--na-violet, #81459E); display: block; }
+
+  /* ─── Order summary sidebar ──────────────────────────────────── */
+  .na-cart-summary {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid var(--na-b100, #D4E6F8);
+    padding: 28px 24px;
+    position: sticky;
+    top: calc(68px + 24px);
+  }
+
+  .na-cart-summary__label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: var(--na-teal, #09CDCD);
+    margin-bottom: 20px;
+    display: block;
+  }
+
+  .na-cart-summary__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+  }
+
+  .na-cart-summary__row-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    font-weight: 300;
+    font-style: italic;
+    color: rgba(0, 45, 114, 0.6);
+  }
+
+  .na-cart-summary__row-value {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--na-navy, #002D72);
+  }
+
+  .na-cart-summary__divider {
+    height: 1px;
+    background: var(--na-b100, #D4E6F8);
+    margin: 16px 0;
+  }
+
+  .na-cart-summary__total-label {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--na-navy, #002D72);
+  }
+
+  .na-cart-summary__total-value {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+    color: var(--na-navy, #002D72);
+    letter-spacing: -0.5px;
+  }
+
+  .na-cart-summary__note {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    color: rgba(0, 45, 114, 0.35);
+    margin-bottom: 20px;
+    display: block;
+    line-height: 1.6;
+  }
+
+  /* ─── Checkout CTA ───────────────────────────────────────────── */
+  .na-cart-checkout {
+    display: block;
+    width: 100%;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: var(--na-teal, #09CDCD);
+    color: var(--na-navy, #002D72);
+    border: none;
+    border-radius: 40px;
+    padding: 16px 24px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: background 0.2s ease, transform 0.1s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .na-cart-checkout:hover {
+    background: var(--na-sea-glass, #A0E5D9);
+  }
+
+  .na-cart-checkout:active {
+    transform: scale(0.98);
+  }
+
+  .na-cart-checkout__lock {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+
+  .na-cart-continue {
+    display: block;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 1px;
+    color: rgba(0, 45, 114, 0.4);
+    text-decoration: none;
+    margin-top: 8px;
+    transition: color 0.2s ease;
+  }
+
+  .na-cart-continue:hover {
+    color: var(--na-teal, #09CDCD);
+  }
+
+  /* Payment icons below checkout */
+  .na-cart-payment-icons {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 16px;
+    opacity: 0.3;
+  }
+
+  .na-cart-payment-icons svg {
+    height: 20px;
+    width: auto;
+  }
+
+  /* ─── Empty cart state ───────────────────────────────────────── */
+  .na-cart-empty {
+    text-align: center;
+    padding: 80px 24px;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .na-cart-empty__icon {
+    width: 64px;
+    height: 64px;
+    stroke: var(--na-b100, #D4E6F8);
+    fill: none;
+    stroke-width: 1;
+    margin: 0 auto 24px;
+    display: block;
+  }
+
+  .na-cart-empty__eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: rgba(0, 45, 114, 0.25);
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .na-cart-empty__heading {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 24px;
+    letter-spacing: -0.5px;
+    color: var(--na-navy, #002D72);
+    margin-bottom: 10px;
+  }
+
+  .na-cart-empty__sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    font-weight: 300;
+    font-style: italic;
+    color: rgba(0, 45, 114, 0.5);
+    margin-bottom: 32px;
+    line-height: 1.6;
+  }
+
+  .na-cart-empty__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: var(--na-teal, #09CDCD);
+    color: var(--na-navy, #002D72);
+    border-radius: 40px;
+    padding: 14px 28px;
+    text-decoration: none;
+    transition: background 0.2s ease;
+  }
+
+  .na-cart-empty__cta:hover {
+    background: var(--na-sea-glass, #A0E5D9);
+  }
+
+  /* ─── Responsive ─────────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    .na-cart-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .na-cart-summary {
+      position: static;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .na-cart-page {
+      padding: 32px 16px 80px;
+    }
+
+    .na-cart-page__heading {
+      font-size: 28px;
+      margin-bottom: 28px;
+    }
+
+    .na-cart-item {
+      grid-template-columns: 72px 1fr;
+      grid-template-rows: auto auto;
+    }
+
+    .na-cart-item__image {
+      width: 72px;
+      height: 72px;
+      grid-row: 1 / 3;
+    }
+
+    .na-cart-item__price,
+    .na-cart-item__line-price {
+      display: none;
+    }
+
+    .na-cart-items__header {
+      display: none;
+    }
+  }
+</style>
+
+<div class="na-cart-page">
+  <span class="na-cart-page__eyebrow">// your cart</span>
+  <h1 class="na-cart-page__heading">
+    {%- if cart.item_count > 0 -%}
+      {{ section.settings.heading | default: 'Your Cart' }}
+      <span style="font-family:'Cormorant Garamond',serif;font-weight:300;font-style:italic;font-size:0.55em;letter-spacing:0;opacity:0.4;">({{ cart.item_count }} {{ cart.item_count | pluralize: 'item', 'items' }})</span>
+    {%- else -%}
+      {{ section.settings.heading | default: 'Your Cart' }}
+    {%- endif -%}
+  </h1>
+
+  {%- if cart.item_count > 0 -%}
+
+    <div class="na-cart-layout">
+
+      {%- comment %} ── Items column ── {%- endcomment %}
+      <div>
+        <div class="na-cart-items__header">
+          <span class="na-cart-items__col-label" style="grid-column: 1/3;">// product</span>
+          <span class="na-cart-items__col-label">// price</span>
+          <span class="na-cart-items__col-label">// qty</span>
+          <span class="na-cart-items__col-label na-cart-items__col-label--right">// total</span>
+        </div>
+
+        {%- form 'cart', cart, id: 'na-cart-form' -%}
+          {%- for item in cart.items -%}
+            <div class="na-cart-item" data-key="{{ item.key }}">
+
+              <div class="na-cart-item__image">
+                {%- if item.image -%}
+                  <img src="{{ item.image | image_url: width: 180 }}" alt="{{ item.image.alt | escape }}" width="88" height="88" loading="lazy">
+                {%- endif -%}
+              </div>
+
+              <div>
+                <a href="{{ item.url }}" class="na-cart-item__title">{{ item.product.title }}</a>
+                {%- unless item.product.has_only_default_variant -%}
+                  <span class="na-cart-item__variant">{{ item.variant.title }}</span>
+                {%- endunless -%}
+              </div>
+
+              <span class="na-cart-item__price">{{ item.original_price | money }}</span>
+
+              <div class="na-cart-item__qty">
+                <button type="button" class="na-cart-item__qty-btn na-qty-minus" data-key="{{ item.key }}" aria-label="Decrease quantity">−</button>
+                <input
+                  type="number"
+                  class="na-cart-item__qty-input"
+                  name="updates[]"
+                  value="{{ item.quantity }}"
+                  min="0"
+                  data-key="{{ item.key }}"
+                  aria-label="Quantity for {{ item.product.title }}"
+                >
+                <button type="button" class="na-cart-item__qty-btn na-qty-plus" data-key="{{ item.key }}" aria-label="Increase quantity">+</button>
+              </div>
+
+              <span class="na-cart-item__line-price">{{ item.final_line_price | money }}</span>
+
+              <button type="button" class="na-cart-item__remove" data-key="{{ item.key }}" aria-label="Remove {{ item.product.title }}">×</button>
+
+            </div>
+          {%- endfor -%}
+        {%- endform -%}
+
+        {%- comment %} ── Discount code ── {%- endcomment %}
+        <div class="na-cart-discount">
+          <button class="na-cart-discount__toggle" id="na-discount-toggle" aria-expanded="false" aria-controls="na-discount-form">
+            <span>+ add promo code</span>
+          </button>
+          <div class="na-cart-discount__form" id="na-discount-form" aria-hidden="true">
+            <input
+              type="text"
+              class="na-cart-discount__input"
+              id="na-discount-input"
+              placeholder="Enter code"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="characters"
+              spellcheck="false"
+            >
+            <button type="button" class="na-cart-discount__apply" id="na-discount-apply">Apply</button>
+          </div>
+          <p class="na-cart-discount__feedback" id="na-discount-feedback"></p>
+        </div>
+
+      </div>{%- comment %} /.items column {%- endcomment %}
+
+      {%- comment %} ── Summary sidebar ── {%- endcomment %}
+      <div class="na-cart-summary">
+        <span class="na-cart-summary__label">// order summary</span>
+
+        <div class="na-cart-summary__row">
+          <span class="na-cart-summary__row-label">Subtotal</span>
+          <span class="na-cart-summary__row-value">{{ cart.original_total_price | money }}</span>
+        </div>
+
+        {%- if cart.cart_level_discount_applications.size > 0 -%}
+          {%- for discount in cart.cart_level_discount_applications -%}
+            <div class="na-cart-summary__row">
+              <span class="na-cart-summary__row-label" style="color:var(--na-teal);">{{ discount.title }}</span>
+              <span class="na-cart-summary__row-value" style="color:var(--na-teal);">−{{ discount.total_allocated_amount | money }}</span>
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+
+        <div class="na-cart-summary__divider"></div>
+
+        <div class="na-cart-summary__row" style="margin-bottom: 4px;">
+          <span class="na-cart-summary__total-label">Total</span>
+          <span class="na-cart-summary__total-value">{{ cart.total_price | money }}</span>
+        </div>
+
+        <span class="na-cart-summary__note">
+          Shipping & taxes calculated at checkout
+        </span>
+
+        <a href="{{ routes.checkout_url }}" class="na-cart-checkout" id="na-checkout-btn">
+          <svg class="na-cart-checkout__lock" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0110 0v4"/>
+          </svg>
+          {{ section.settings.checkout_label | default: 'Proceed to Checkout' }}
+        </a>
+
+        <a href="{{ routes.all_products_collection_url }}" class="na-cart-continue">
+          ← {{ section.settings.continue_label | default: 'Continue shopping' }}
+        </a>
+
+        {%- if shop.enabled_payment_types.size > 0 -%}
+          <div class="na-cart-payment-icons">
+            {%- for type in shop.enabled_payment_types -%}
+              {{ type | payment_type_svg_tag }}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
+      </div>{%- comment %} /.na-cart-summary {%- endcomment %}
+
+    </div>
+
+  {%- else -%}
+
+    {%- comment %} ── Empty cart state ── {%- endcomment %}
+    <div class="na-cart-empty">
+      <svg class="na-cart-empty__icon" viewBox="0 0 64 64" aria-hidden="true">
+        <path d="M16 8H8L4 24v32a4 4 0 004 4h48a4 4 0 004-4V24L56 8h-8"/>
+        <line x1="4" y1="24" x2="60" y2="24"/>
+        <path d="M40 32a8 8 0 01-16 0"/>
+      </svg>
+      <span class="na-cart-empty__eyebrow">// nothing here yet</span>
+      <h2 class="na-cart-empty__heading">{{ section.settings.empty_heading | default: 'Your cart is empty' }}</h2>
+      <p class="na-cart-empty__sub">{{ section.settings.empty_sub | default: 'Looks like you haven\'t added anything yet.' }}</p>
+      <a href="{{ routes.all_products_collection_url }}" class="na-cart-empty__cta">
+        {{ section.settings.empty_cta | default: 'Continue Shopping' }}
+      </a>
+    </div>
+
+  {%- endif -%}
+
+</div>
+
+<script>
+  (function () {
+    // ── Quantity steppers & remove ────────────────────────────────
+    async function updateCart(key, quantity) {
+      const res  = await fetch('/cart/change.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: key, quantity })
+      });
+      const cart = await res.json();
+      document.dispatchEvent(new CustomEvent('cart:updated', { detail: { itemCount: cart.item_count } }));
+      // Reload to reflect updated prices / items
+      window.location.reload();
+    }
+
+    document.querySelectorAll('.na-qty-minus').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const input = document.querySelector(`.na-cart-item__qty-input[data-key="${btn.dataset.key}"]`);
+        const newQty = Math.max(0, parseInt(input.value) - 1);
+        updateCart(btn.dataset.key, newQty);
+      });
+    });
+
+    document.querySelectorAll('.na-qty-plus').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const input = document.querySelector(`.na-cart-item__qty-input[data-key="${btn.dataset.key}"]`);
+        updateCart(btn.dataset.key, parseInt(input.value) + 1);
+      });
+    });
+
+    document.querySelectorAll('.na-cart-item__remove').forEach(btn => {
+      btn.addEventListener('click', () => updateCart(btn.dataset.key, 0));
+    });
+
+    // ── Discount code toggle ──────────────────────────────────────
+    const toggle   = document.getElementById('na-discount-toggle');
+    const form     = document.getElementById('na-discount-form');
+    const input    = document.getElementById('na-discount-input');
+    const apply    = document.getElementById('na-discount-apply');
+    const feedback = document.getElementById('na-discount-feedback');
+
+    if (toggle) {
+      toggle.addEventListener('click', () => {
+        const open = form.classList.toggle('is-open');
+        toggle.setAttribute('aria-expanded', open);
+        form.setAttribute('aria-hidden', !open);
+        if (open) setTimeout(() => input.focus(), 300);
+      });
+    }
+
+    if (apply) {
+      apply.addEventListener('click', () => {
+        const code = input.value.trim().toUpperCase();
+        if (!code) return;
+        // Shopify discount codes are applied at checkout via URL param
+        const checkoutBtn = document.getElementById('na-checkout-btn');
+        if (checkoutBtn) {
+          const url = new URL(checkoutBtn.href);
+          url.searchParams.set('discount', code);
+          checkoutBtn.href = url.toString();
+        }
+        if (feedback) {
+          feedback.textContent = `// code "${code}" will be applied at checkout`;
+          feedback.className = 'na-cart-discount__feedback is-success';
+        }
+      });
+    }
+
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Cart",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Cart page heading",
+      "default": "Your Cart"
+    },
+    {
+      "type": "text",
+      "id": "checkout_label",
+      "label": "Checkout button label",
+      "default": "Proceed to Checkout"
+    },
+    {
+      "type": "text",
+      "id": "continue_label",
+      "label": "Continue shopping label",
+      "default": "Continue shopping"
+    },
+    {
+      "type": "header",
+      "content": "Empty cart"
+    },
+    {
+      "type": "text",
+      "id": "empty_heading",
+      "label": "Empty cart heading",
+      "default": "Your cart is empty"
+    },
+    {
+      "type": "text",
+      "id": "empty_sub",
+      "label": "Empty cart subtext",
+      "default": "Looks like you haven't added anything yet."
+    },
+    {
+      "type": "text",
+      "id": "empty_cta",
+      "label": "Empty cart CTA label",
+      "default": "Continue Shopping"
+    }
+  ],
+  "blocks": [],
+  "enabled_on": {
+    "templates": ["cart"]
+  }
+}
+{% endschema %}
